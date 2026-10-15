@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0369a1">
+  <title>Report a Flood · Guwahati Flood Reporting System</title>
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="report">
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img src="images/logo.svg" width="36" height="36" alt="">
+        <span>Guwahati Flood Report<small>Flood reporting &amp; monitoring</small></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+        <span class="nav-icon nav-icon-menu" aria-hidden="true">☰</span>
+        <span class="nav-icon nav-icon-close" aria-hidden="true">✕</span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+        <a href="index.html" data-nav="home">Home</a>
+        <a href="reports.html" data-nav="reports">Reports</a>
+        <a href="map.html" data-nav="map">Flood Map</a>
+        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="report.html" class="btn btn-primary btn-sm nav-cta" data-nav="report">⚠ Report Flood</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <h1>Report a flood</h1>
+        <p>Quick form — takes under a minute. Fields marked * are required.</p>
+      </div>
+
+      <ol class="form-steps" id="form-steps">
+        <li><b>1</b> Location</li>
+        <li><b>2</b> Severity</li>
+        <li><b>3</b> Photo</li>
+        <li><b>4</b> Submit</li>
+      </ol>
+
+      <form id="report-form" class="card" novalidate>
+
+        <section class="form-section">
+          <h2><span class="fs-no">1</span> Tag the location</h2>
+
+          <div class="field" id="field-area">
+            <label for="area-input">Area / locality *</label>
+            <input type="text" id="area-input" list="area-list" placeholder="e.g. Beltola, Dispur, Six Mile…" autocomplete="off">
+            <datalist id="area-list"></datalist>
+            <p class="hint">Start typing to search Guwahati areas — or pick the exact spot on the map.</p>
+            <p class="field-error" id="area-error">Please enter or choose an area.</p>
+          </div>
+
+          <div class="loc-actions">
+            <button type="button" class="btn btn-outline" id="btn-gps">📍 Use my current location</button>
+            <button type="button" class="btn btn-ghost" id="btn-clear-loc" hidden>✕ Clear pin</button>
+          </div>
+          <p class="loc-status" id="loc-status" role="status" aria-live="polite"></p>
+
+          <div class="field" id="field-loc">
+            <label>Confirm the flood spot on the map</label>
+            <div id="pick-map"></div>
+            <p class="hint">Tap the map to drop a pin. You can drag the pin to fine-tune it.</p>
+            <div class="coord-readout" id="coord-readout">No location pinned yet</div>
+            <p class="field-error">Pin the spot on the map, use GPS, or choose a known area above.</p>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2><span class="fs-no">2</span> How severe is the flooding? *</h2>
+          <div class="field" id="field-sev">
+            <div class="sev-picker" role="radiogroup" aria-label="Flood severity">
+              <label class="sev-option" data-sev="low">
+                <input type="radio" name="severity" value="low">
+                <span><span class="dot"></span>🟢 Low</span>
+              </label>
+              <label class="sev-option" data-sev="moderate">
+                <input type="radio" name="severity" value="moderate">
+                <span><span class="dot"></span>🟡 Moderate</span>
+              </label>
+              <label class="sev-option" data-sev="high">
+                <input type="radio" name="severity" value="high">
+                <span><span class="dot"></span>🟠 High</span>
+              </label>
+              <label class="sev-option" data-sev="critical">
+                <input type="radio" name="severity" value="critical">
+                <span><span class="dot"></span>🔴 Critical</span>
+              </label>
+            </div>
+            <p class="field-error">Please choose a severity level.</p>
+          </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label for="water-input">Water level <span class="opt">(optional)</span></label>
+              <input type="number" id="water-input" min="0" max="100" step="0.1" inputmode="decimal" placeholder="e.g. 1.5">
+              <p class="hint">Approximate depth in feet</p>
+            </div>
+            <div class="field" id="field-dt">
+              <label for="dt-input">Date &amp; time *</label>
+              <input type="datetime-local" id="dt-input">
+              <p class="field-error">Please set when this was observed.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2><span class="fs-no">3</span> Details &amp; photo</h2>
+          <div class="field">
+            <label for="desc-input">Description <span class="opt">(optional)</span></label>
+            <textarea id="desc-input" maxlength="400" placeholder="What's happening? Traffic, houses, drains, people stuck…"></textarea>
+            <p class="hint"><span id="desc-count">0</span>/400 characters</p>
+          </div>
+          <div class="field">
+            <label>Photo <span class="opt">(optional)</span></label>
+            <label class="file-btn" id="file-btn" for="photo-input">📷 Add a photo</label>
+            <input type="file" id="photo-input" accept="image/*" hidden>
+            <div class="photo-preview" id="photo-preview" hidden>
+              <img id="photo-img" alt="Selected photo preview">
+              <button type="button" class="photo-remove" id="photo-remove" aria-label="Remove photo">✕</button>
+            </div>
+            <p class="hint">Photos are resized and stored only in this browser.</p>
+          </div>
+        </section>
+
+        <div class="form-error" id="form-error" hidden></div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Submit flood report</button>
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <button type="button" class="btn btn-ghost btn-block" id="btn-reset">Clear form</button>
+        </div>
+        <p class="hint text-center">No login needed — reports are saved in this browser (prototype).</p>
+      </form>
+
+      <div class="card success-panel" id="success-panel" hidden>
+        <div class="success-icon">✅</div>
+        <h2>Report submitted!</h2>
+        <p id="success-text">Your report is now live on the flood map.</p>
+        <div class="success-actions">
+          <a class="btn btn-primary btn-block" id="success-map-link" href="map.html">🗺 View on Flood Map</a>
+          <a class="btn btn-outline btn-block" href="report.html">Report another location</a>
+          <a class="btn btn-ghost btn-block" href="index.html">Back to home</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav aria-label="Footer">
+        <a href="index.html">Home</a>
+        <a href="report.html">Report</a>
+        <a href="map.html">Map</a>
+        <a href="reports.html">Reports</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+      <p><strong>Guwahati Flood Reporting System</strong> — prototype. Reports are saved in your browser (localStorage); no account or server needed yet.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/report.js"></script>
+</body>
+</html>
